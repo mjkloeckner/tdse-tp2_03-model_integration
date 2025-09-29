@@ -52,25 +52,26 @@
 #include "task_actuator_interface.h"
 
 /********************** macros and definitions *******************************/
-#define G_TASK_SYS_CNT_INI			0ul
-#define G_TASK_SYS_TICK_CNT_INI		0ul
+#define G_TASK_SYS_CNT_INI      0ul
+#define G_TASK_SYS_TICK_CNT_INI 0ul
 
-#define DEL_SYS_MIN					0ul
-#define DEL_SYS_MED					50ul
-#define DEL_SYS_MAX					500ul
+#define DEL_SYS_MIN             0ul
+#define DEL_SYS_MED             50ul
+#define DEL_SYS_MAX             500ul
 
 /********************** internal data declaration ****************************/
-task_system_dta_t task_system_dta =
-	{DEL_SYS_MIN, ST_SYS_IDLE, EV_SYS_IDLE, false};
+task_system_dta_t task_system_dta = {
+    DEL_SYS_MIN, ST_SYS_IDLE, EV_SYS_IDLE, false
+};
 
-#define SYSTEM_DTA_QTY	(sizeof(task_system_dta)/sizeof(task_system_dta_t))
+#define SYSTEM_DTA_QTY (sizeof(task_system_dta)/sizeof(task_system_dta_t))
 
 /********************** internal functions declaration ***********************/
 void task_system_statechart(void);
 
 /********************** internal data definition *****************************/
-const char *p_task_system 		= "Task System (System Statechart)";
-const char *p_task_system_ 		= "Non-Blocking & Update By Time Code";
+const char *p_task_system  = "Task System (System Statechart)";
+const char *p_task_system_ = "Non-Blocking & Update By Time Code";
 
 /********************** external data declaration ****************************/
 uint32_t g_task_system_cnt;
@@ -79,146 +80,146 @@ volatile uint32_t g_task_system_tick_cnt;
 /********************** external functions definition ************************/
 void task_system_init(void *parameters)
 {
-	task_system_dta_t 	*p_task_system_dta;
-	task_system_st_t	state;
-	task_system_ev_t	event;
-	bool b_event;
+    task_system_dta_t *p_task_system_dta;
+    task_system_st_t state;
+    task_system_ev_t event;
+    bool b_event;
 
-	/* Print out: Task Initialized */
-	LOGGER_INFO(" ");
-	LOGGER_INFO("  %s is running - %s", GET_NAME(task_system_init), p_task_system);
-	LOGGER_INFO("  %s is a %s", GET_NAME(task_system), p_task_system_);
+    /* Print out: Task Initialized */
+    LOGGER_INFO(" ");
+    LOGGER_INFO("  %s is running - %s", GET_NAME(task_system_init), p_task_system);
+    LOGGER_INFO("  %s is a %s", GET_NAME(task_system), p_task_system_);
 
-	/* Init & Print out: Task execution counter */
-	g_task_system_cnt = G_TASK_SYS_CNT_INI;
-	LOGGER_INFO("   %s = %lu", GET_NAME(g_task_system_cnt), g_task_system_cnt);
+    /* Init & Print out: Task execution counter */
+    g_task_system_cnt = G_TASK_SYS_CNT_INI;
+    LOGGER_INFO("   %s = %lu", GET_NAME(g_task_system_cnt), g_task_system_cnt);
 
-	init_queue_event_task_system();
+    init_queue_event_task_system();
 
-	/* Update Task Actuator Configuration & Data Pointer */
-	p_task_system_dta = &task_system_dta;
+    /* Update Task Actuator Configuration & Data Pointer */
+    p_task_system_dta = &task_system_dta;
 
-	/* Init & Print out: Task execution FSM */
-	state = ST_SYS_IDLE;
-	p_task_system_dta->state = state;
+    /* Init & Print out: Task execution FSM */
+    state = ST_SYS_IDLE;
+    p_task_system_dta->state = state;
 
-	event = EV_SYS_IDLE;
-	p_task_system_dta->event = event;
+    event = EV_SYS_IDLE;
+    p_task_system_dta->event = event;
 
-	b_event = false;
-	p_task_system_dta->flag = b_event;
+    b_event = false;
+    p_task_system_dta->flag = b_event;
 
-	LOGGER_INFO(" ");
-	LOGGER_INFO("   %s = %lu   %s = %lu   %s = %s",
-				 GET_NAME(state), (uint32_t)state,
-				 GET_NAME(event), (uint32_t)event,
-				 GET_NAME(b_event), (b_event ? "true" : "false"));
+    LOGGER_INFO(" ");
+    LOGGER_INFO("   %s = %lu   %s = %lu   %s = %s",
+            GET_NAME(state), (uint32_t)state,
+            GET_NAME(event), (uint32_t)event,
+            GET_NAME(b_event), (b_event ? "true" : "false"));
 }
 
 void task_system_update(void *parameters)
 {
-	bool b_time_update_required = false;
+    bool b_time_update_required = false;
 
-	/* Protect shared resource */
-	__asm("CPSID i");	/* disable interrupts */
+    /* Protect shared resource */
+    __asm("CPSID i"); /* disable interrupts */
     if (G_TASK_SYS_TICK_CNT_INI < g_task_system_tick_cnt)
     {
-		/* Update Tick Counter */
-    	g_task_system_tick_cnt--;
-    	b_time_update_required = true;
+        /* Update Tick Counter */
+        g_task_system_tick_cnt--;
+        b_time_update_required = true;
     }
-    __asm("CPSIE i");	/* enable interrupts */
+    __asm("CPSIE i"); /* enable interrupts */
 
     while (b_time_update_required)
     {
-		/* Update Task Counter */
-		g_task_system_cnt++;
+        /* Update Task Counter */
+        g_task_system_cnt++;
 
-		/* Run Task Statechart */
-    	task_system_statechart();
+        /* Run Task Statechart */
+        task_system_statechart();
 
-    	/* Protect shared resource */
-		__asm("CPSID i");	/* disable interrupts */
-		if (G_TASK_SYS_TICK_CNT_INI < g_task_system_tick_cnt)
-		{
-			/* Update Tick Counter */
-			g_task_system_tick_cnt--;
-			b_time_update_required = true;
-		}
-		else
-		{
-			b_time_update_required = false;
-		}
-		__asm("CPSIE i");	/* enable interrupts */
+        /* Protect shared resource */
+        __asm("CPSID i"); /* disable interrupts */
+        if (G_TASK_SYS_TICK_CNT_INI < g_task_system_tick_cnt)
+        {
+            /* Update Tick Counter */
+            g_task_system_tick_cnt--;
+            b_time_update_required = true;
+        }
+        else
+        {
+            b_time_update_required = false;
+        }
+        __asm("CPSIE i"); /* enable interrupts */
     }
 }
 
 void task_system_statechart(void)
 {
-	task_system_dta_t *p_task_system_dta;
+    task_system_dta_t *p_task_system_dta;
 
-	/* Update Task System Data Pointer */
-	p_task_system_dta = &task_system_dta;
+    /* Update Task System Data Pointer */
+    p_task_system_dta = &task_system_dta;
 
-	if (true == any_event_task_system())
-	{
-		p_task_system_dta->flag = true;
-		p_task_system_dta->event = get_event_task_system();
-	}
+    if (true == any_event_task_system())
+    {
+        p_task_system_dta->flag = true;
+        p_task_system_dta->event = get_event_task_system();
+    }
 
-	switch (p_task_system_dta->state)
-	{
-		case ST_SYS_IDLE:
+    switch (p_task_system_dta->state)
+    {
+        case ST_SYS_IDLE:
 
-			if ((true == p_task_system_dta->flag) && (EV_SYS_LOOP_DET == p_task_system_dta->event))
-			{
-				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
-				p_task_system_dta->state = ST_SYS_ACTIVE_01;
-			}
+            if ((true == p_task_system_dta->flag) && (EV_SYS_LOOP_DET == p_task_system_dta->event))
+            {
+                p_task_system_dta->flag = false;
+                put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
+                p_task_system_dta->state = ST_SYS_ACTIVE_01;
+            }
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_01:
+        case ST_SYS_ACTIVE_01:
 
-			if ((true == p_task_system_dta->flag) && (EV_SYS_IDLE == p_task_system_dta->event))
-			{
-				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_XX_OFF, ID_LED_A);
-				p_task_system_dta->state = ST_SYS_IDLE;
-			}
+            if ((true == p_task_system_dta->flag) && (EV_SYS_IDLE == p_task_system_dta->event))
+            {
+                p_task_system_dta->flag = false;
+                put_event_task_actuator(EV_LED_XX_OFF, ID_LED_A);
+                p_task_system_dta->state = ST_SYS_IDLE;
+            }
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_02:
+        case ST_SYS_ACTIVE_02:
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_03:
+        case ST_SYS_ACTIVE_03:
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_04:
+        case ST_SYS_ACTIVE_04:
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_05:
+        case ST_SYS_ACTIVE_05:
 
-			break;
+            break;
 
-		case ST_SYS_ACTIVE_06:
+        case ST_SYS_ACTIVE_06:
 
-			break;
+            break;
 
-		default:
+        default:
 
-			p_task_system_dta->tick  = DEL_SYS_MIN;
-			p_task_system_dta->state = ST_SYS_IDLE;
-			p_task_system_dta->event = EV_SYS_IDLE;
-			p_task_system_dta->flag = false;
+            p_task_system_dta->tick  = DEL_SYS_MIN;
+            p_task_system_dta->state = ST_SYS_IDLE;
+            p_task_system_dta->event = EV_SYS_IDLE;
+            p_task_system_dta->flag = false;
 
-			break;
-	}
+            break;
+    }
 }
 
 /********************** end of file ******************************************/

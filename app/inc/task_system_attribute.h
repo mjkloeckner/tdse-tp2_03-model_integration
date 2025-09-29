@@ -49,65 +49,73 @@ extern "C" {
 
 /********************** typedef **********************************************/
 /* System Statechart - State Transition Table */
-/* 	------------------------+-----------------------+-----------------------+-----------------------+------------------------
- * 	| Current               | Event                 |                       | Next                  |                       |
- * 	| State                 | (Parameters)          | [Guard]               | State                 | Actions               |
- * 	|=======================+=======================+=======================+=======================+=======================|
- * 	| INICIAL               |                       |                       | ST_SYS_IDLE           |                       |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_IDLE           | EV_SYS_LOOP_DET       |                       | ST_SYS_ACTIVE_01      | 						|
- * 	|                       |                       |                       |                       | 						|
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_01      | EV_SYS_MANUAL_BTN     |                       | ST_SYS_ACTIVE_02      | tick = TICK_MAX       |
- * 	|                       |                       |                       |                       | put_event_t.._actuator|
- * 	|                       |                       |                       |                       | (event, identifier)   |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_02      |                       | [tick == 0]           | ST_SYS_ACTIVE_03      | put_event_t.._actuator|
- * 	|                       |                       |                       |                       | (event, identifier)   |
- * 	|                       |                       +-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick >  0]           | ST_SYS_ACTIVE_02      | tick--                |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_03      | EV_SYS_NOT_LOOP_DET   |                       | ST_SYS_ACTIVE_04      | 						|
- * 	|                       |                       |                       |                       | 						|
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_04      | EV_SYS_IR_PHO_CELL    |                       | ST_SYS_ACTIVE_05      | 						|
- * 	|                       |                       |                       |                       | 						|
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_05      | EV_SYS_IR_NOT_PHO_CELL|                       | ST_SYS_ACTIVE_06      | tick = TICK_MAX       |
- * 	|                       |                       |                       |                       | put_event_t.._actuator|
- * 	|                       |                       |                       |                       | (event, identifier)   |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_SYS_ACTIVE_06      |                       | [tick == 0]           | ST_SYS_IDLE           | put_event_t.._actuator|
- * 	|                       |                       |                       |                       | (event, identifier)   |
- * 	|                       |                       +-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick >  0]           | ST_SYS_ACTIVE_06      | tick--                |
- * 	------------------------+-----------------------+-----------------------+-----------------------+------------------------
+/* +------------------+----------------------- +-------------+------------------+-----------------------+
+ * | Current          | Event                  |             | Next             |                       |
+ * | State            | (Parameters)           | [Guard]     | State            | Actions               |
+ * |==================+======================= +=============+==================+=======================|
+ * | INICIAL          |                        |             | ST_SYS_IDLE      |                       |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_IDLE      | EV_SYS_LOOP_DET        |             | ST_SYS_ACTIVE_01 |                       |
+ * |                  |                        |             |                  |                       |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_01 | EV_SYS_MANUAL_BTN      |             | ST_SYS_ACTIVE_02 | tick = TICK_MAX       |
+ * |                  |                        |             |                  | put_event_t.._actuator|
+ * |                  |                        |             |                  | (event, identifier)   |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_02 |                        | [tick == 0] | ST_SYS_ACTIVE_03 | put_event_t.._actuator|
+ * |                  |                        |             |                  | (event, identifier)   |
+ * |                  |                        +-------------+------------------+-----------------------|
+ * |                  |                        | [tick >  0] | ST_SYS_ACTIVE_02 | tick--                |
+ * |                  |                        |             |                  |                       |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_03 | EV_SYS_NOT_LOOP_DET    |             | ST_SYS_ACTIVE_04 |                       |
+ * |                  |                        |             |                  |                       |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_04 | EV_SYS_IR_PHO_CELL     |             | ST_SYS_ACTIVE_05 |                       |
+ * |                  |                        |             |                  |                       |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_05 | EV_SYS_IR_NOT_PHO_CELL |             | ST_SYS_ACTIVE_06 | tick = TICK_MAX       |
+ * |                  |                        |             |                  | put_event_t.._actuator|
+ * |                  |                        |             |                  | (event, identifier)   |
+ * |------------------+----------------------- +-------------+------------------+-----------------------|
+ * | ST_SYS_ACTIVE_06 |                        | [tick == 0] | ST_SYS_IDLE      | put_event_t.._actuator|
+ * |                  |                        |             |                  | (event, identifier)   |
+ * |                  |                        +-------------+------------------+-----------------------|
+ * |                  |                        | [tick >  0] | ST_SYS_ACTIVE_06 | tick--                |
+ * |                  |                        |             |                  |                       |
+ * +------------------+----------------------- +-------------+------------------+-----------------------+
  */
 
 /* Events to excite Task System */
-typedef enum task_system_ev {EV_SYS_IDLE,
-							 EV_SYS_LOOP_DET,
-							 EV_SYS_NOT_LOOP_DET,
-							 EV_SYS_MANUAL_BTN,
-							 EV_SYS_NOT_MANUAL_BTN,
-							 EV_SYS_IR_PHO_CELL,
-							 EV_SYS_NOT_IR_PHO_CELL} task_system_ev_t;
+typedef enum
+{
+    EV_SYS_IDLE,
+    EV_SYS_LOOP_DET,
+    EV_SYS_NOT_LOOP_DET,
+    EV_SYS_MANUAL_BTN,
+    EV_SYS_NOT_MANUAL_BTN,
+    EV_SYS_IR_PHO_CELL,
+    EV_SYS_NOT_IR_PHO_CELL
+} task_system_ev_t;
 
 /* State of Task System */
-typedef enum task_system_st {ST_SYS_IDLE,
-							 ST_SYS_ACTIVE_01,
-							 ST_SYS_ACTIVE_02,
-							 ST_SYS_ACTIVE_03,
-							 ST_SYS_ACTIVE_04,
-							 ST_SYS_ACTIVE_05,
-							 ST_SYS_ACTIVE_06} task_system_st_t;
+typedef enum
+{
+    ST_SYS_IDLE,
+    ST_SYS_ACTIVE_01,
+    ST_SYS_ACTIVE_02,
+    ST_SYS_ACTIVE_03,
+    ST_SYS_ACTIVE_04,
+    ST_SYS_ACTIVE_05,
+    ST_SYS_ACTIVE_06
+} task_system_st_t;
 
 typedef struct
 {
-	uint32_t			tick;
-	task_system_st_t	state;
-	task_system_ev_t	event;
-	bool				flag;
+    uint32_t         tick;
+    task_system_st_t state;
+    task_system_ev_t event;
+    bool             flag;
 } task_system_dta_t;
 
 /********************** external data declaration ****************************/
