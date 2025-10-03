@@ -61,14 +61,10 @@
 /********************** internal data declaration ****************************/
 
 const task_sensor_cfg_t task_sensor_cfg_list[] = {
-    {ID_BTN_A,  BTN_A_PORT,  BTN_A_PIN,  BTN_A_PRESSED,
-        DEL_BTN_XX_MAX, EV_SYS_IDLE,  EV_SYS_LOOP_DET},
-    {ID_BTN_B,  BTN_B_GPIO_Port,  BTN_B_Pin,  BTN_A_PRESSED,
-        DEL_BTN_XX_MAX, EV_SYS_IDLE,  EV_SYS_LOOP_DET},
-    {ID_BTN_C,  BTN_C_GPIO_Port,  BTN_C_Pin,  BTN_A_PRESSED,
-        DEL_BTN_XX_MAX, EV_SYS_IDLE,  EV_SYS_LOOP_DET},
-    {ID_BTN_D,  BTN_D_GPIO_Port,  BTN_D_Pin,  BTN_A_PRESSED,
-        DEL_BTN_XX_MAX, EV_SYS_IDLE,  EV_SYS_LOOP_DET}
+    {ID_BTN_A,  BTN_A_PORT,       BTN_A_PIN,  BTN_A_PRESSED, DEL_BTN_XX_MAX, EV_SYS_IDLE, EV_SYS_IDLE},
+    {ID_BTN_B,  BTN_B_GPIO_Port,  BTN_B_Pin,  BTN_A_PRESSED, DEL_BTN_XX_MAX, EV_SYS_NOT_LOOP_DET, EV_SYS_LOOP_DET},
+    {ID_BTN_C,  BTN_C_GPIO_Port,  BTN_C_Pin,  BTN_A_PRESSED, DEL_BTN_XX_MAX, EV_SYS_NOT_MANUAL_BTN, EV_SYS_MANUAL_BTN},
+    {ID_BTN_D,  BTN_D_GPIO_Port,  BTN_D_Pin,  BTN_A_PRESSED, DEL_BTN_XX_MAX, EV_SYS_NOT_IR_PHO_CELL, EV_SYS_IR_PHO_CELL}
 };
 
 #define SENSOR_CFG_QTY (sizeof(task_sensor_cfg_list)/sizeof(task_sensor_cfg_t))
