@@ -49,92 +49,98 @@ extern "C" {
 
 /********************** typedef **********************************************/
 /* Actuator Statechart - State Transition Table */
-/* 	------------------------+-----------------------+-----------------------+-----------------------+------------------------
- * 	| Current               | Event                 |                       | Next                  |                       |
- * 	| State                 | (Parameters)          | [Guard]               | State                 | Actions               |
- * 	|=======================+=======================+=======================+=======================+=======================|
- * 	| INICIAL               |                       |                       | ST_LED_XX_OFF         | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_LED_XX_OFF         | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       |-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       | EV_LED_XX_BLINK       |                       | ST_LED_XX_BLINK_ON    | tick = tick_max       |
- * 	|                       |                       |                       |                       | led = LED_ON			|
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       |-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       | EV_LED_XX_PULSE       |                       | ST_LED_XX_PULSE       | tick = tick_max       |
- * 	|                       |                       |                       |                       | led = LED_ON			|
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_LED_XX_ON          | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF		    | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_LED_XX_BLINK_ON    | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF         | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick == 0]           | ST_LED_XX_BLINK_OFF   | tick = tick_max       |
- * 	|                       |                       |                       |                       | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick >  0]           | ST_LED_XX_BLINK_ON    | tick--                |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_LED_XX_BLINK_OFF   | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF         | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick >  0]           | ST_LED_XX_BLINK_OFF   | tick--                |
- * 	|                       +-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick == 0]           | ST_LED_XX_BLINK_ON    | tick = tick_max       |
- * 	|                       |                       |                       |                       | led = LED_ON          |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	| ST_LED_XX_PULSE       |                       | [tick == 0]           | ST_LED_XX_OFF         | tick = tick_max       |
- * 	|                       |                       |                       |                       | led = LED_OFF         |
- * 	|                       |                       |                       |                       | op_led(led)           |
- * 	|-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
- * 	|                       |                       | [tick >  0]           | ST_LED_XX_PULSE       | tick--                |
- * 	------------------------+-----------------------+-----------------------+-----------------------+------------------------ */
+/* +-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+
+ * | Current               | Event                 |                       | Next                  |                       |
+ * | State                 | (Parameters)          | [Guard]               | State                 | Actions               |
+ * |=======================+=======================+=======================+=======================+=======================|
+ * | INICIAL               |                       |                       | ST_LED_XX_OFF         | led = LED_OFF         |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * | ST_LED_XX_OFF         | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       |-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       | EV_LED_XX_BLINK       |                       | ST_LED_XX_BLINK_ON    | tick = tick_max       |
+ * |                       |                       |                       |                       | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       |-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       | EV_LED_XX_PULSE       |                       | ST_LED_XX_PULSE       | tick = tick_max       |
+ * |                       |                       |                       |                       | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * | ST_LED_XX_ON          | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF		    | led = LED_OFF        |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * | ST_LED_XX_BLINK_ON    | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF         | led = LED_OFF         |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       |                       | [tick == 0]           | ST_LED_XX_BLINK_OFF   | tick = tick_max       |
+ * |                       |                       |                       |                       | led = LED_OFF         |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       |                       | [tick >  0]           | ST_LED_XX_BLINK_ON    | tick--                |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * | ST_LED_XX_BLINK_OFF   | EV_LED_XX_OFF         |                       | ST_LED_XX_OFF         | led = LED_OFF         |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       | EV_LED_XX_ON          |                       | ST_LED_XX_ON          | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       |                       | [tick >  0]           | ST_LED_XX_BLINK_OFF   | tick--                |
+ * |                       +-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       |                       | [tick == 0]           | ST_LED_XX_BLINK_ON    | tick = tick_max       |
+ * |                       |                       |                       |                       | led = LED_ON          |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * | ST_LED_XX_PULSE       |                       | [tick == 0]           | ST_LED_XX_OFF         | tick = tick_max       |
+ * |                       |                       |                       |                       | led = LED_OFF         |
+ * |                       |                       |                       |                       | op_led(led)           |
+ * |-----------------------+-----------------------+-----------------------+-----------------------+-----------------------|
+ * |                       |                       | [tick >  0]           | ST_LED_XX_PULSE       | tick--                |
+ * +-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+ */
 
 /* Events to excite Task Actuator */
-typedef enum task_actuator_ev {EV_LED_XX_OFF,
-							   EV_LED_XX_ON,
-							   EV_LED_XX_NOT_BLINK,
-							   EV_LED_XX_BLINK,
-							   EV_LED_XX_PULSE} task_actuator_ev_t;
+typedef enum {
+    EV_LED_XX_OFF,
+    EV_LED_XX_ON,
+    EV_LED_XX_NOT_BLINK,
+    EV_LED_XX_BLINK,
+    EV_LED_XX_PULSE
+} task_actuator_ev_t;
 
 /* States of Task Actuator */
-typedef enum task_actuator_st {ST_LED_XX_OFF,
-							   ST_LED_XX_ON,
-							   ST_LED_XX_BLINK_ON,
-							   ST_LED_XX_BLINK_OFF,
-							   ST_LED_XX_PULSE} task_actuator_st_t;
+typedef enum {
+    ST_LED_XX_OFF,
+    ST_LED_XX_ON,
+    ST_LED_XX_BLINK_ON,
+    ST_LED_XX_BLINK_OFF,
+    ST_LED_XX_PULSE
+} task_actuator_st_t;
 
 /* Identifier of Task Actuator */
-typedef enum task_actuator_id {ID_LED_A} task_actuator_id_t;
+typedef enum {
+    ID_LED_A
+} task_actuator_id_t;
 
 typedef struct
 {
-	task_actuator_id_t	identifier;
-	GPIO_TypeDef *		gpio_port;
-	uint16_t			pin;
-	GPIO_PinState		led_on;
-	GPIO_PinState		led_off;
-	uint32_t			tick_blink;
-	uint32_t			tick_pulse;
+    task_actuator_id_t identifier;
+    GPIO_TypeDef *gpio_port;
+    uint16_t pin;
+    GPIO_PinState led_on;
+    GPIO_PinState led_off;
+    uint32_t tick_blink;
+    uint32_t tick_pulse;
 } task_actuator_cfg_t;
 
 typedef struct
 {
-	uint32_t			tick;
-	task_actuator_st_t	state;
-	task_actuator_ev_t	event;
-	bool				flag;
+    uint32_t tick;
+    task_actuator_st_t state;
+    task_actuator_ev_t event;
+    bool flag;
 } task_actuator_dta_t;
 
 /********************** external data declaration ****************************/

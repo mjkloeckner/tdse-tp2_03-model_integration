@@ -111,17 +111,17 @@ typedef enum
 typedef struct
 {
     task_sensor_id_t identifier;
-    GPIO_TypeDef *   gpio_port;
-    uint16_t         pin;
-    GPIO_PinState    pressed;
-    uint32_t         tick_max;
+    GPIO_TypeDef *gpio_port;
+    uint16_t pin;
+    GPIO_PinState pressed;
+    uint32_t tick_max;
     task_sensor_ev_t signal_up;
     task_sensor_ev_t signal_down;
 } task_sensor_cfg_t;
 
 typedef struct
 {
-    uint32_t         tick;
+    uint32_t tick;
     task_sensor_st_t state;
     task_sensor_ev_t event;
 } task_sensor_dta_t;
