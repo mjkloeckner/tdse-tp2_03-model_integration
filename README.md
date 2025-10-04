@@ -7,9 +7,9 @@ eventos](https://es.wikipedia.org/wiki/Programaci%C3%B3n_dirigida_por_eventos),
 ademas se actualiza en cada milisegundo. A su vez esta aplicación incluye 3
 tareas `task_sensor`, `task_system` y `task_actuator` las cuales se modelan
 mediante maquinas de estado. De estas 3 tareas en esta instancia solo se ha
-implementado la maquina de estados de la primera `task_sensor`, de las restantes
-solo se ha implementado lo suficiente como para que la aplicación se ejecute sin
-errores.
+implementado la maquina de estados de la primeras 2 `task_sensor` y
+`task_system`, de la restante solo se ha implementado lo suficiente como para
+que la aplicación se ejecute sin errores.
 
 ## Estructura del proyecto
 
