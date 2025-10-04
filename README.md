@@ -164,19 +164,72 @@ incremente de 13 us a 106 us.
 ### Archivo `app/src/task_sensor.c`
 
 En este archivo se implementa las funciones del modelo sensor, el cual se
-modela, en esta instancia como un botón, utilizando una maquina de estados.
+modela, como multiples botones, utilizando una maquina de estados por cada uno.
+
+Las subrutinas que se presentan son `task_sensor_init`, `task_sensor_update` y
+`task_sensor_statechart`. La primera `task_sensor_init` se invoca por única vez
+al iniciar la tarea (cuando se invoca `app_init`) e inicializa las variables de
+todas las maquinas de estados de modelo sensor disponibles (definidas en
+`task_sensor_cfg_list` y `task_sensor_dta_list`). Las ultimas dos subrutinas
+`task_sensor_update` y `task_sensor_statechart` se invocan continuamente en el
+superloop, al invocar `app_update`, en particular en `app_update` se llama a
+`task_sensor_update` y esta internamente invoca la función
+`task_sensor_statechart`, la cual actualiza el estado de cada una de la maquina
+de estados disponibles del modelo `task_sensor`.
 
 ### Archivo `app/src/task_sensor_attribute.h`
 
+En este archivo se describen los atributos de la maquina de estados del modelo
+sensor, como son los eventos que recibe y los estados posibles, también se
+definen las estructuras que representan esta maquina de estados, de manera tal
+de poder representar multiples sensores.
+
 ### Archivo `app/task_sensor.png`
 
-## Diagrama de estados de tareas
-
-Como se mencionó previamente, las tareas se modelan mediante maquinas de
-estados, a continuación se muestras los diagramas respectivos.
-
-![](app/task_actuator.png)
+En este archivo se presenta el diagrama de estados completo de la maquina de
+estados que representa al sensor. Por ser un diagrama de estados se muestran
+todos los posibles estados, como también el inicial, y como cambian estos al
+recibir eventos.
 
 ![](app/task_sensor.png)
+
+### Archivo `app/src/task_system.c`
+
+En este archivo se implementa las funciones del modelo system, el cual se
+modela, como una única maquina de estados.
+
+Las subrutinas que se presentan son `task_system_init`, `task_system_update` y
+`task_system_statechart`. La primera `task_system_init` se invoca por única vez
+al iniciar la tarea (cuando se invoca `app_init`) e inicializa las variables de
+la maquina de estados del modelo system (definidas en la instancia de la
+estructura `task_system_dta_t`, `task_system_dta`). Las ultimas dos subrutinas
+`task_system_update` y `task_system_statechart` se invocan continuamente en el
+superloop, al invocar `app_update`, en particular en `app_update` se llama a
+`task_system_update` y esta internamente invoca la función
+`task_system_statechart`, la cual actualiza el estado de la maquina de estados
+del modelo system de acuerdo al estado en que este y los eventos que se reciben.
+
+### Archivo `app/src/task_system_attribute.h`
+
+En este archivo se describen los atributos de la maquina de estados del modelo
+system, como son los eventos que recibe y los estados posibles, también se
+definen las estructuras que representan esta maquina de estados.
+
+### Archivo `app/src/task_system_interface.h`
+
+En este archivo se define una serie de subrutinas para interactuar con el modelo
+system, de manera de enviar y recibir eventos, por ejemplo recibir eventos del
+modelo system y enviar eventos al modelo actuator.
+
+Las subrutinas que se definen son `init_queue_event_task_system`,
+`put_event_task_system`, `task_system_ev_t get_event_task_system` y
+`any_event_task_system`.
+
+### Archivo `app/task_system.png`
+
+En este archivo se presenta el diagrama de estados completo de la maquina de
+estados que representa al sistema. Por ser un diagrama de estados se muestran
+todos los posibles estados, incluyendo el estado inicial, y como cambian estos
+al recibir eventos.
 
 ![](app/task_system.png)
